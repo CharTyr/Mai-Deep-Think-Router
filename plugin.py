@@ -68,7 +68,7 @@ class DeepThinkPlugin(MaiBotPlugin):
     async def on_unload(self) -> None:
         """插件卸载。"""
 
-    async def on_config_update(self) -> None:
+    async def on_config_update(self, scope: str, config_data: Dict[str, Any], version: str) -> None:
         """配置热更新。"""
 
     @HookHandler(
