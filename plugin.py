@@ -86,7 +86,7 @@ class DeepThinkPlugin(MaiBotPlugin):
 
         tool_definitions: List[Dict[str, Any]] = kwargs.get("tool_definitions", [])
         if not isinstance(tool_definitions, list):
-            return {}
+            return {"action": "continue"}
 
         modified = False
         for tool_def in tool_definitions:
@@ -115,8 +115,8 @@ class DeepThinkPlugin(MaiBotPlugin):
             break
 
         if modified:
-            return {"tool_definitions": tool_definitions}
-        return {}
+            return {"action": "continue", "modified_kwargs": {"tool_definitions": tool_definitions}}
+        return {"action": "continue"}
 
     @HookHandler(
         "maisaka.replyer.before_request",
@@ -139,21 +139,23 @@ class DeepThinkPlugin(MaiBotPlugin):
             pass
 
         if think_level < 1:
-            return {}
+            return {"action": "continue"}
 
-        result: Dict[str, Any] = {}
+        modified_kwargs: Dict[str, Any] = {}
 
         # 指定深度思考模型
         model_name = self.config.deep_think.model_name.strip()
         if model_name:
-            result["model_name"] = model_name
+            modified_kwargs["model_name"] = model_name
 
         # 追加引导提示
         extra_prompt = self.config.deep_think.extra_prompt.strip()
         if extra_prompt:
-            result["extra_prompt"] = extra_prompt
+            modified_kwargs["extra_prompt"] = extra_prompt
 
-        return result
+        if modified_kwargs:
+            return {"action": "continue", "modified_kwargs": modified_kwargs}
+        return {"action": "continue"}
 
 
 def create_plugin() -> DeepThinkPlugin:
