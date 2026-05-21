@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "version": "1.0.0",
   "name": "深度思考路由插件",
-  "description": "当 Planner 标记 think_level=1 时，自动将 replyer 切换到深度思考模型任务组",
+  "description": "当 Planner 判定问题需要深度推理时，自动切换到指定的思考模型进行回复",
   "author": {
     "name": "CharTyr",
     "url": "https://github.com/CharTyr"
