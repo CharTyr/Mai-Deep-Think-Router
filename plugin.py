@@ -51,10 +51,13 @@ class DeepThinkPluginConfig(PluginConfigBase):
 THINK_LEVEL_PARAM = {
     "think_level": {
         "type": "integer",
-        "description": "思考深度。0=普通回复；1=需要深度推理、逻辑分析、复杂计算或回忆大量上下文时使用。",
+        "description": "思考深度。0=普通回复（默认）；1=当问题需要深度推理、逻辑分析、复杂计算或回忆大量上下文时使用，会启用深度思考模型生成更详细的回复。",
         "default": 0,
     }
 }
+
+# 追加到 reply 工具 description 末尾的引导文本
+REPLY_DESCRIPTION_SUFFIX = "参数 think_level 可选：0=普通回复（默认），1=当问题需要深度推理、逻辑分析、复杂计算或回忆大量上下文时使用。"
 
 
 class DeepThinkPlugin(MaiBotPlugin):
@@ -79,7 +82,7 @@ class DeepThinkPlugin(MaiBotPlugin):
         order=HookOrder.NORMAL,
     )
     async def handle_planner_before_request(self, **kwargs: Any) -> Dict[str, Any]:
-        """在 Planner 请求前，向 reply 工具的 parameters 中注入 think_level。"""
+        """在 Planner 请求前，向 reply 工具的 parameters 中注入 think_level 并补充描述。"""
 
         tool_definitions: List[Dict[str, Any]] = kwargs.get("tool_definitions", [])
         if not isinstance(tool_definitions, list):
@@ -96,16 +99,18 @@ class DeepThinkPlugin(MaiBotPlugin):
             if func_info.get("name") != "reply":
                 continue
 
+            # 注入 think_level 参数到 schema
             parameters = func_info.get("parameters")
-            if not isinstance(parameters, dict):
-                continue
-            properties = parameters.get("properties")
-            if not isinstance(properties, dict):
-                continue
+            if isinstance(parameters, dict):
+                properties = parameters.get("properties")
+                if isinstance(properties, dict) and "think_level" not in properties:
+                    properties.update(THINK_LEVEL_PARAM)
+                    modified = True
 
-            # 注入 think_level 参数
-            if "think_level" not in properties:
-                properties.update(THINK_LEVEL_PARAM)
+            # 在工具描述中追加引导
+            current_desc = str(func_info.get("description") or "")
+            if "think_level" not in current_desc:
+                func_info["description"] = f"{current_desc} {REPLY_DESCRIPTION_SUFFIX}".strip()
                 modified = True
             break
 
