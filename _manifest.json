@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "name": "深度思考路由插件",
+  "description": "当 Planner 标记 think_level=1 时，自动将 replyer 切换到深度思考模型任务组",
+  "author": {
+    "name": "CharTyr",
+    "url": "https://github.com/CharTyr"
+  },
+  "license": "GPL-v3.0-or-later",
+  "urls": {
+    "repository": "https://github.com/MaiM-with-u/MaiBot"
+  },
+  "host_application": {
+    "min_version": "1.0.0",
+    "max_version": "1.0.0"
+  },
+  "sdk": {
+    "min_version": "2.0.0",
+    "max_version": "2.99.99"
+  },
+  "dependencies": [],
+  "capabilities": [],
+  "i18n": {
+    "default_locale": "zh-CN",
+    "locales_path": "_locales",
+    "supported_locales": ["zh-CN"]
+  },
+  "id": "chartyr.deep-think-router"
+}
